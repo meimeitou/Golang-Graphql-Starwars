@@ -364,6 +364,8 @@ func (r *Resolver) Starship(args struct{ ID graphql.ID }) *starshipResolver {
 	return nil
 }
 
+//=====================mutation============
+
 // createReview(episode: Episode!, review: ReviewInput!): Review
 func (r *Resolver) CreateReview(args *struct {
 	Episode string
