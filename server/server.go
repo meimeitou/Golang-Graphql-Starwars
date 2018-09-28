@@ -2,13 +2,13 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
 	"github.com/graph-gophers/graphql-go"
 	"github.com/graph-gophers/graphql-go/example/starwars"
 	"github.com/graph-gophers/graphql-go/relay"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
@@ -20,7 +20,12 @@ type user struct {
 var schema *graphql.Schema
 
 func init() {
-	schema = graphql.MustParseSchema(starwars.Schema, &starwars.Resolver{})
+	schemaFile := "./schem.gql"
+	s, err := ioutil.ReadFile(schemaFile)
+	if err != nil {
+		panic(err)
+	}
+	schema = graphql.MustParseSchema(string(s), &starwars.Resolver{})
 }
 
 func main() {
@@ -29,15 +34,7 @@ func main() {
 	}))
 
 	http.Handle("/query", &relay.Handler{Schema: schema})
-	connParams := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true&loc=Asia%%2FShanghai", "medusa", "123456", "10.16.17.2", 3499, "python")
-	db, _ := gorm.Open("mysql", connParams)
-	db.SingularTable(true)
-	data := user{}
-	sa := make(map[string]interface{})
-	sa["name"] = "yin2"
-	db.First(&data, sa)
-	fmt.Println(data)
-	db.Close()
+	fmt.Println("localhost:8080/query/")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
